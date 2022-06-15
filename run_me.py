@@ -15,13 +15,13 @@ def upload_to_s3(symbol,i):
 query_string = "+".join(query.split()).strip()
 df = pd.read_csv('states.csv')
 print(df)
-for i in range(0,len(df)):
+for i in range(8,len(df)):
     state = df.loc[i,'State']
     print(state)
-    command = f"scrapy crawl yp -o output/{state}.csv -a query={query_string} -a location={state}"
+    command = f"scrapy crawl yp -o output/{state.replace(' ', '_')}.csv -a query={query_string} -a location={state.replace(' ','+')}"
     print(command)
     os.system(command)
-    upload_to_s3(state,i)
+    upload_to_s3(state.replace(' ', '_'),i)
 
 
     
