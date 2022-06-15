@@ -22,7 +22,7 @@ def Get_Data():
         os.system(command)
 
 def main():
-    # Get_links()
+    Get_links()
     Get_Data()
 
 
