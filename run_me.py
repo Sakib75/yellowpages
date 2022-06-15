@@ -1,27 +1,26 @@
 import os 
 import pandas as pd
-import boto3
-query = "Garden Center"
 
-access_key = input('Enter aws acecss key')
-secret_access_key = input('Enter secret access key')
-def upload_to_s3(symbol,i):
-    client = boto3.client('s3', aws_access_key_id=access_key,aws_secret_access_key=secret_access_key)
-    upload_file_bucket = 'glassdoor-ratings'
-    upload_file_key = f'yp/{i}-' + str(symbol) + '.csv'
-    print(upload_file_key)
-    client.upload_file(f"output/{symbol}.csv",upload_file_bucket,upload_file_key,ExtraArgs={'ACL':'public-read'})
+query = "Garden Center"
 
 query_string = "+".join(query.split()).strip()
 df = pd.read_csv('states.csv')
-print(df)
-for i in range(8,len(df)):
+
+for i in range(2,len(df)):
     state = df.loc[i,'State']
     print(state)
-    command = f"scrapy crawl yp -o output/{state.replace(' ', '_')}.csv -a query={query_string} -a location={state.replace(' ','+')}"
-    print(command)
+    command = f"scrapy crawl yp -o output_links/{i}-{state.replace(' ', '_')}.csv -a query={query_string} -a location={state.replace(' ','+')}"
     os.system(command)
-    upload_to_s3(state.replace(' ', '_'),i)
+
+files = os.listdir('output_links/')
+files.sort()
+
+for file in files:
+    command = f"scrapy crawl yp_scraper -a input_file=output_links/{file} -o output_data/{file.replace('.csv','_data.csv')}"
+    os.system(command)
+
+
+
 
 
     
