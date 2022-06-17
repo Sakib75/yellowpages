@@ -1,9 +1,9 @@
 import os 
 import pandas as pd
 
-def Get_links():
-    query = "Garden Center"
 
+
+def Get_links(query):
     query_string = "+".join(query.split()).strip()
     df = pd.read_csv('states.csv')
 
@@ -14,20 +14,31 @@ def Get_links():
         os.system(command)
 
 def Get_Data():
-    files = os.listdir('output_links/')
-    files.sort()
+    df = pd.read_csv('states.csv')
 
-    for file in files:
+    for i in range(0,len(df)):
+        file = f"{i}-{df.loc[i,'State'].replace(' ','_')}.csv"
+        print(file)
         command = f"scrapy crawl yp_scraper -a input_file=output_links/{file} -o output_data/{file.replace('.csv','_data.csv')}"
         os.system(command)
 
-def main():
-    # Get_links()
-    Get_Data()
+def Merge_data(query):
+    files = os.listdir('output_data/')
+    all_data = []
+    for file in files:
+        all_data.append(pd.read_csv('output_data/' + file))
+    df = pd.concat(all_data)
+    df = df.drop_duplicates()
+    df.to_csv(f"{query.replace(' ','_')}.csv", index=False)
+    print(df)
 
+def main(query):
+    Get_links(query=query)
+    Get_Data()
+    Merge_data(query=query)
 
 if __name__ == '__main__':
-    main()
+    main(query = "Garden Center")
 
 
 
